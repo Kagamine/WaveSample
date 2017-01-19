@@ -7,7 +7,7 @@ namespace System
 {
     public class WaveStream : IDisposable
     {
-        public WaveStream(Stream stream, int ByteSample = 2, int DataPosition = 40)
+        public WaveStream(Stream stream, int ByteSample = 4, int DataPosition = 40)
         {
             _baseStream = stream;
             _dataPosition = DataPosition;
@@ -15,7 +15,7 @@ namespace System
             _length = (int)_baseStream.Length - DataPosition;
         }
 
-        public WaveStream(string Path, int ByteSample = 2, int DataPosition = 40)
+        public WaveStream(string Path, int ByteSample = 4, int DataPosition = 40)
             : this(new FileStream(Path, FileMode.Open, FileAccess.Read), ByteSample, DataPosition)
         {
         }
@@ -35,14 +35,44 @@ namespace System
                 {
                     for (var j = i; j < cnt && j < i + 10; j += _byteSample * 2)
                     {
-                        tmp.Add(BitConverter.ToInt32(buffer, (int)j) / 2147483648D);
+                        if (_byteSample == 1)
+                        {
+                            tmp.Add(buffer[j] / 256D);
+                        }
+                        else if (_byteSample == 2)
+                        {
+                            tmp.Add(BitConverter.ToInt16(buffer, (int)j) / 32768D);
+                        }
+                        else if (_byteSample == 4)
+                        {
+                            tmp.Add(BitConverter.ToInt32(buffer, (int)j) / 2147483648D);
+                        }
+                        else // _byteSample == 8
+                        {
+                            tmp.Add(BitConverter.ToInt64(buffer, (int)j) / 9223372036854775808D);
+                        }
                     }
                     yield return tmp.Average();
                     tmp.Clear();
                 }
                 else
                 {
-                    yield return BitConverter.ToInt32(buffer, (int)i) / 2147483648D;
+                    if (_byteSample == 1)
+                    {
+                        yield return buffer[j] / 256D;
+                    }
+                    else if (_byteSample == 2)
+                    {
+                        yield return BitConverter.ToInt16(buffer, (int)j) / 32768D;
+                    }
+                    else if (_byteSample == 4)
+                    {
+                        yield return BitConverter.ToInt32(buffer, (int)j) / 2147483648D;
+                    }
+                    else // _byteSample == 8
+                    {
+                        yield return BitConverter.ToInt64(buffer, (int)j) / 9223372036854775808D;
+                    }
                 }
             }
         }
