@@ -1,0 +1,55 @@
+﻿@model IEnumerable<double>
+<html>
+<body>
+    <style>
+        .wave{
+            width: 1px;
+            float:left;
+            background: blue;
+        }
+    </style>
+    <h2>Wave</h2>
+    <div style="height: 50px;overflow: hidden;transform: rotateX(180deg);">
+        @for (var i = 0; i < Model.Count(); i++)
+        {
+            if (i % 2 == 0)
+            {
+                if (Model.ElementAt(i) < 0)
+                {
+                    <div class="wave" style="height:50px;background:#fff;"></div>
+                }
+                else
+                {
+                    <div class="wave" style="height:@(Math.Abs((Model.ElementAt(i) * 50)).ToString("F1"))px"></div>
+                }
+            }
+        }
+    </div>
+    <div style="height: 50px;overflow: hidden">
+        @for (var i = 0; i < Model.Count(); i++)
+        {
+            if (i % 2 == 0)
+            {
+                if (Model.ElementAt(i) < 0)
+                {
+                    <div class="wave" style="height:@(Math.Abs((Model.ElementAt(i) * 50)).ToString("F1"))px"></div>
+                }
+                else
+                {
+                    <div class="wave" style="height:50px;background:#fff;"></div>
+                }
+            }
+        }
+    </div>
+    <h2>Swing</h2>
+    <div style="height: 50px;overflow: hidden;transform: rotateX(180deg);">
+        @for (var i = 0; i < Model.Count(); i++)
+        {
+            if (i % 2 == 0)
+            {
+                <div class="wave" style="height:@(Math.Abs((Model.ElementAt(i) * 50)).ToString("F1"))px"></div>
+            }
+        }
+    </div>
+</body>
+</html>
