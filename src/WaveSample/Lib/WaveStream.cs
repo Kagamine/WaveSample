@@ -83,6 +83,8 @@ namespace System
             var per = cnt / Count;
             if (per % _byteSample != 0)
                 per = per - per % _byteSample;
+            if (per < 1)
+                per = 1;
             var buffer = new byte[_length];
             _baseStream.Position = _dataPosition;
             await _baseStream.ReadAsync(buffer, 0, _length);
@@ -93,6 +95,8 @@ namespace System
         {
             var cnt = _length / _byteSample;
             var per = cnt / Count;
+            if (per < 1)
+                per = 1;
             var buffer = new byte[_length];
             _baseStream.Position = _dataPosition;
             _baseStream.Read(buffer, 0, _length);
