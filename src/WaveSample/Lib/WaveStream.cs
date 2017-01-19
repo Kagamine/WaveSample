@@ -59,19 +59,19 @@ namespace System
                 {
                     if (_byteSample == 1)
                     {
-                        yield return buffer[j] / 256D;
+                        yield return buffer[i] / 256D;
                     }
                     else if (_byteSample == 2)
                     {
-                        yield return BitConverter.ToInt16(buffer, (int)j) / 32768D;
+                        yield return BitConverter.ToInt16(buffer, (int)i) / 32768D;
                     }
                     else if (_byteSample == 4)
                     {
-                        yield return BitConverter.ToInt32(buffer, (int)j) / 2147483648D;
+                        yield return BitConverter.ToInt32(buffer, (int)i) / 2147483648D;
                     }
                     else // _byteSample == 8
                     {
-                        yield return BitConverter.ToInt64(buffer, (int)j) / 9223372036854775808D;
+                        yield return BitConverter.ToInt64(buffer, (int)i) / 9223372036854775808D;
                     }
                 }
             }
