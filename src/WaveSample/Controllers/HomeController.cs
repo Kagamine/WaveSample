@@ -23,7 +23,7 @@ namespace WaveSample.Controllers
             await File.CopyToAsync(memStream);
             using (var wave = new WaveStream(memStream, 4, 42))
             {
-                return View("Show", await wave.GetSampleAsync(Count));
+                return View("Show", await wave.GetSampleAsync(Count, true));
             }
         }
     }

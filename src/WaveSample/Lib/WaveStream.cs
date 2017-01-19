@@ -26,15 +26,28 @@ namespace System
 
         private int _dataPosition, _byteSample, _length;
         
-        private IEnumerable<double> _getSample(byte[] buffer, long cnt, long per)
+        private IEnumerable<double> _getSample(byte[] buffer, long cnt, long per, bool ave)
         {
+            var tmp = new List<double>();
             for (var i = 0L; i < cnt; i+= per)
             {
-                yield return BitConverter.ToInt32(buffer, (int)i) / 2147483648D;
+                if (ave)
+                {
+                    for (var j = i; j < cnt && j < i + 10; j += _byteSample * 2)
+                    {
+                        tmp.Add(BitConverter.ToInt32(buffer, (int)j) / 2147483648D);
+                    }
+                    yield return tmp.Average();
+                    tmp.Clear();
+                }
+                else
+                {
+                    yield return BitConverter.ToInt32(buffer, (int)i) / 2147483648D;
+                }
             }
         }
 
-        public async Task<IEnumerable<double>> GetSampleAsync(int Count)
+        public async Task<IEnumerable<double>> GetSampleAsync(int Count, bool Average = false)
         {
             var cnt = _length / _byteSample;
             var per = cnt / Count;
@@ -43,17 +56,17 @@ namespace System
             var buffer = new byte[_length];
             _baseStream.Position = _dataPosition;
             await _baseStream.ReadAsync(buffer, 0, _length);
-            return _getSample(buffer, cnt, per);
+            return _getSample(buffer, cnt, per, Average);
         }
 
-        public IEnumerable<double> GetSample(int Count)
+        public IEnumerable<double> GetSample(int Count, bool Average = false)
         {
             var cnt = _length / _byteSample;
             var per = cnt / Count;
             var buffer = new byte[_length];
             _baseStream.Position = _dataPosition;
             _baseStream.Read(buffer, 0, _length);
-            return _getSample(buffer, cnt, per);
+            return _getSample(buffer, cnt, per, Average);
         }
 
         public void Dispose()
