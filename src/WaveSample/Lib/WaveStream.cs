@@ -33,11 +33,11 @@ namespace System
             {
                 if (ave)
                 {
-                    for (var j = i; j < cnt && j < i + 10; j += _byteSample * 2)
+                    for (var j = i; j < cnt && j < i + 10; j += _byteSample)
                     {
                         if (_byteSample == 1)
                         {
-                            tmp.Add(buffer[j] / 256D);
+                            tmp.Add((buffer[j] - 127) / 128D);
                         }
                         else if (_byteSample == 2)
                         {
@@ -59,7 +59,7 @@ namespace System
                 {
                     if (_byteSample == 1)
                     {
-                        yield return buffer[i] / 256D;
+                        yield return (buffer[i] - 127) / 128D;
                     }
                     else if (_byteSample == 2)
                     {
