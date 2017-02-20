@@ -21,7 +21,7 @@ namespace WaveSample.Controllers
         {
             var memStream = new MemoryStream();
             await File.CopyToAsync(memStream);
-            using (var wave = new WaveStream(memStream, 1, 42))
+            using (var wave = new WaveStream(memStream, 1, 44))
             {
                 return View("Show", await wave.GetSampleAsync(Count));
             }
