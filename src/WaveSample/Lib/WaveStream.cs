@@ -26,58 +26,35 @@ namespace System
 
         private int _dataPosition, _byteSample, _length;
         
-        private IEnumerable<double> _getSample(byte[] buffer, long cnt, long per, bool ave)
+        private IEnumerable<double> _getSample(byte[] buffer, long cnt, long per)
         {
-            var tmp = new List<double>();
-            for (var i = 0L; i < cnt; i+= per)
+            for (var x = 0L; x< cnt; x+= per)
             {
-                if (ave)
-                {
-                    for (var j = i; j < cnt && j < i + 10; j += _byteSample)
-                    {
-                        if (_byteSample == 1)
-                        {
-                            tmp.Add((buffer[j] - 127) / 128D);
-                        }
-                        else if (_byteSample == 2)
-                        {
-                            tmp.Add(BitConverter.ToInt16(buffer, (int)j) / 32768D);
-                        }
-                        else if (_byteSample == 4)
-                        {
-                            tmp.Add(BitConverter.ToInt32(buffer, (int)j) / 2147483648D);
-                        }
-                        else // _byteSample == 8
-                        {
-                            tmp.Add(BitConverter.ToInt64(buffer, (int)j) / 9223372036854775808D);
-                        }
-                    }
-                    yield return tmp.Average();
-                    tmp.Clear();
-                }
-                else
+                var tmp = new HashSet<double>();
+                for (var i = x; i < x + per && i < cnt; i++)
                 {
                     if (_byteSample == 1)
                     {
-                        yield return (buffer[i] - 127) / 128D;
+                        tmp.Add(Math.Abs((buffer[i] - 127) / 128D));
                     }
                     else if (_byteSample == 2)
                     {
-                        yield return BitConverter.ToInt16(buffer, (int)i) / 32768D;
+                        tmp.Add(Math.Abs(BitConverter.ToInt16(buffer, (int)i) / 32768D));
                     }
                     else if (_byteSample == 4)
                     {
-                        yield return BitConverter.ToInt32(buffer, (int)i) / 2147483648D;
+                        tmp.Add(Math.Abs(BitConverter.ToInt32(buffer, (int)i) / 2147483648D));
                     }
                     else // _byteSample == 8
                     {
-                        yield return BitConverter.ToInt64(buffer, (int)i) / 9223372036854775808D;
+                        tmp.Add(Math.Abs(BitConverter.ToInt64(buffer, (int)i) / 9223372036854775808D));
                     }
                 }
+                yield return tmp.Average();
             }
         }
 
-        public async Task<IEnumerable<double>> GetSampleAsync(int Count, bool Average = false)
+        public async Task<IEnumerable<double>> GetSampleAsync(int Count)
         {
             var cnt = _length / _byteSample;
             var per = cnt / Count;
@@ -88,10 +65,10 @@ namespace System
             var buffer = new byte[_length];
             _baseStream.Position = _dataPosition;
             await _baseStream.ReadAsync(buffer, 0, _length);
-            return _getSample(buffer, cnt, per, Average);
+            return _getSample(buffer, cnt, per);
         }
 
-        public IEnumerable<double> GetSample(int Count, bool Average = false)
+        public IEnumerable<double> GetSample(int Count)
         {
             var cnt = _length / _byteSample;
             var per = cnt / Count;
@@ -100,7 +77,7 @@ namespace System
             var buffer = new byte[_length];
             _baseStream.Position = _dataPosition;
             _baseStream.Read(buffer, 0, _length);
-            return _getSample(buffer, cnt, per, Average);
+            return _getSample(buffer, cnt, per);
         }
 
         public void Dispose()
